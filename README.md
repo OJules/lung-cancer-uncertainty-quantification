@@ -1,4 +1,4 @@
-# 📊 Uncertainty Quantification for Lung Cancer Prognosis - Results
+# 📊 Uncertainty Quantification for Lung Cancer Prognosis
 
 **Author:** Jules Odje  
 **Institution:** University of Neuchâtel  
