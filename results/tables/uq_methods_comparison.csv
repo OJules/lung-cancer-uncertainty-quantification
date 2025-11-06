@@ -1,0 +1,4 @@
+Méthode,Type d'incertitude,Haute confiance (%),Coverage / Garantie,Métrique principale,Avantage
+Conformal Prediction,Ensembliste (sets),65.9%,68.2% (90% target),Avg set size: 1.341,Garanties mathématiques
+Bayesian Inference,Probabiliste (distributions),25.0%,Percentile-based (25%),Avg std: 0.261,Distribution complète
+Calibration,Correction probabilités,N/A,ECE=0.042,Brier: 0.244,Validation calibration
