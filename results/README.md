@@ -176,7 +176,13 @@ This counterintuitive result reveals two phenomena:
 
 ### 6.3 Visualization
 
-![Overconfidence Paradox](figures/uq_paradox_analysis.png)
+The paradox is illustrated in the comparative analysis visualizations 
+(see Figure: UQ Methods Comparison).
+
+Key observations from the data:
+- High confidence cases: Mean probability distance from 0.5 = 0.35
+- Low confidence cases: Mean probability distance from 0.5 = 0.12
+- This confirms overconfident predictions on extreme probabilities
 
 ### 6.4 Clinical Implications
 
