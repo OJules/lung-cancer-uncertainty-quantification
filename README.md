@@ -1,308 +1,390 @@
-# 📊 Uncertainty Quantification for Lung Cancer Prognosis
+# 🏥 Uncertainty Quantification for Lung Cancer Prognosis
 
-**Author:** Jules Odje  
-**Institution:** University of Neuchâtel  
-**Date:** November 2024  
-**Project:** Uncertainty Quantification in Medical AI
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Made with Jupyter](https://img.shields.io/badge/Made%20with-Jupyter-orange?logo=Jupyter)](https://jupyter.org/try)
 
----
-
-## 🎯 Executive Summary
-
-This project implements and compares three uncertainty quantification (UQ) methods for lung cancer survival prediction:
-- **Conformal Prediction**: Provides prediction sets with coverage guarantees
-- **Bayesian Inference**: Quantifies uncertainty through probability distributions
-- **Model Calibration**: Ensures predicted probabilities reflect true likelihoods
-
-**Key Finding:** Cases flagged as "low confidence" by both UQ methods achieved 92% accuracy, while "high confidence" cases achieved only 50%, revealing a critical model overconfidence issue.
+**Master's Thesis Project**  
+*University of Neuchâtel - Data Science & AI*  
+**Author:** Jules Odje 
+**Date:** November 2024
 
 ---
 
-## 🚀 1. Final Model Performance Summary
+## 📖 Table of Contents
 
-The baseline Random Forest model was evaluated on the test set (N=44 patients):
-
-| Metric | Value |
-|--------|-------|
-| **Test Accuracy** | 61.4% |
-| **AUC-ROC** | 0.598 |
-| **Brier Score** | 0.244 |
-| **ECE (Calibration)** | 0.042 |
-
-**Conclusion:** The model performs moderately above random chance but is naturally well-calibrated, making it suitable for uncertainty quantification analysis.
-
----
-
-## 🔮 2. Conformal Prediction Results
-
-Conformal Prediction provides prediction sets with mathematical coverage guarantees.
-
-### 2.1 Best Configuration
-
-| Parameter | Value |
-|-----------|-------|
-| **Significance Level (α)** | 0.10 (90% target) |
-| **Coverage (Test)** | 68.2% |
-| **Average Set Size** | 1.341 |
-| **High Confidence Cases** | 65.9% (29/44) |
-
-### 2.2 Coverage Analysis
-
-| Confidence Level | Target Coverage | Empirical Coverage | Average Set Size |
-|------------------|----------------|-------------------|------------------|
-| 90% (α=0.10) | 90% | 68.2% | 1.341 |
-| 95% (α=0.05) | 95% | 86.4% | 1.500 |
-
-**Findings:** Empirical coverage is below theoretical target (68% vs 90%), likely due to small test set size (N=44) and model miscalibration on difficult cases.
-
-### 2.3 Visualization
-
-![Conformal Prediction Results](figures/conformal_prediction_results.png)
-
-**Key Observations:**
-- 65.9% of cases have singleton prediction sets (high confidence)
-- 34.1% have ambiguous predictions (both classes possible)
-- Coverage gap suggests model struggles on borderline cases
+- [Overview](#-overview)
+- [Key Findings](#-key-findings)
+- [Project Structure](#-project-structure)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Results](#-results)
+- [Methodology](#-methodology)
+- [Citation](#-citation)
+- [License](#-license)
+- [Contact](#-contact)
 
 ---
 
-## 🎲 3. Bayesian Inference Results
+## 🎯 Overview
 
-Bayesian Inference quantifies uncertainty through probability distributions over predictions.
+This project investigates **uncertainty quantification (UQ)** methods for machine learning models in medical prognosis, specifically focusing on lung cancer survival prediction. 
 
-### 3.1 Best Configuration (Adaptive Thresholds)
+### Why This Matters
 
-| Confidence Level | Threshold | Cases | Percentage |
-|------------------|-----------|-------|------------|
-| **High** | std < 0.224 (25th percentile) | 11/44 | 25.0% |
-| **Medium** | 0.224 ≤ std < 0.283 (75th percentile) | 22/44 | 50.0% |
-| **Low** | std ≥ 0.283 | 11/44 | 25.0% |
+Machine learning models in healthcare often produce confident predictions without quantifying their uncertainty. This poses serious risks:
+- **Overconfident predictions** can lead to incorrect treatment decisions
+- **Lack of uncertainty awareness** prevents safe clinical deployment
+- **No mechanism to flag ambiguous cases** for expert review
 
-### 3.2 Uncertainty Statistics
+### Our Approach
 
-| Metric | Value |
-|--------|-------|
-| **Mean Std** | 0.261 |
-| **Mean Entropy** | 0.665 |
-| **Mean 90% Credible Interval Width** | 0.831 |
+We implement and compare three complementary uncertainty quantification methods:
 
-**Findings:** High baseline uncertainty (mean std=0.26) indicates the Random Forest trees produce diverse predictions, reflecting genuine model uncertainty.
-
-### 3.3 Visualization
-
-![Bayesian Inference Results](figures/bayesian_inference_results.png)
-
-**Key Observations:**
-- Distribution of uncertainty is broad (std ranges from 0.12 to 0.35)
-- Adaptive thresholds ensure balanced classification (25-50-25%)
-- Strong correlation between standard deviation and credible interval width
+1. **Conformal Prediction** - Provides prediction sets with mathematical coverage guarantees
+2. **Bayesian Inference** - Quantifies uncertainty through probability distributions
+3. **Model Calibration** - Ensures predicted probabilities reflect true likelihoods
 
 ---
 
-## 📐 4. Calibration Results
+## 🔥 Key Findings
 
-Model calibration assesses whether predicted probabilities reflect true frequencies.
+### 🚨 The Overconfidence Paradox
 
-### 4.1 Calibration Metrics Comparison
+We discovered a **counterintuitive phenomenon**:
 
-| Method | Brier Score ↓ | ECE ↓ | Best? |
-|--------|--------------|-------|-------|
-| **Uncalibrated (Baseline)** | **0.2439** | **0.0416** | ✅ |
-| Platt Scaling | 0.2596 | 0.2497 | ❌ |
-| Isotonic Regression | 0.2801 | 0.1963 | ❌ |
+> Cases where BOTH UQ methods flagged as "LOW confidence" achieved **91.7% accuracy**  
+> Cases where BOTH flagged as "HIGH confidence" achieved only **50% accuracy**
 
-**Findings:** The baseline Random Forest was already well-calibrated. Post-hoc calibration methods (Platt, Isotonic) worsened performance due to:
-1. Small validation set (N=43) causing overfitting
-2. Random Forests naturally calibrate through ensemble averaging
+This reveals that:
+- Models can be **dangerously overconfident** on difficult cases
+- **Honest uncertainty** (P ≈ 0.5) paradoxically indicates more reliable predictions
+- Multiple UQ methods are **essential** to distinguish overconfidence from true uncertainty
 
-### 4.2 Visualization
+### 📊 Performance Summary
 
-![Calibration Results](figures/calibration_results.png)
+| UQ Method | High Confidence Rate | Key Metric | Advantage |
+|-----------|---------------------|------------|-----------|
+| Conformal Prediction | 65.9% (29/44) | 68.2% coverage | Mathematical guarantees |
+| Bayesian Inference | 25.0% (11/44) | Std = 0.261 | Full distributions |
+| Calibration | Baseline best | Brier = 0.244 | Natural calibration |
 
-**Key Observations:**
-- Reliability diagram shows baseline model closely follows the diagonal
-- Low ECE (0.042) confirms good calibration
-- Post-hoc methods overcorrect and increase miscalibration
+### 🏥 Clinical Impact
 
----
-
-## 📊 5. Comparative Analysis of UQ Methods
-
-### 5.1 Method Comparison Table
-
-| Method | Type | High Confidence | Coverage/Guarantee | Main Advantage |
-|--------|------|----------------|-------------------|----------------|
-| **Conformal Prediction** | Set-based | 65.9% (29/44) | 68.2% (90% target) | Mathematical guarantees |
-| **Bayesian Inference** | Distribution | 25.0% (11/44) | Percentile-based (25%) | Full distributions |
-| **Calibration** | Probability correction | N/A | ECE=0.042 | Validates reliability |
-
-### 5.2 Agreement Between Methods
-
-Analysis of cases where Conformal and Bayesian methods agree or disagree:
-
-| Agreement Type | Cases | Percentage | Accuracy |
-|----------------|-------|------------|----------|
-| **Both HIGH confidence** | 8/44 | 18.2% | 50.0% ⚠️ |
-| **Both LOW confidence** | 12/44 | 27.3% | **91.7%** ✅ |
-| **Disagreement** | 24/44 | 54.5% | 50.0% ⚠️ |
-
-### 5.3 Visualization
-
-![UQ Methods Comparison](figures/uq_methods_comparison.png)
-
----
-
-## 🔥 6. The Overconfidence Paradox (Key Discovery)
-
-### 6.1 The Paradox
-
-**Unexpected Finding:** Cases where BOTH UQ methods flagged as "LOW confidence" achieved significantly higher accuracy (91.7%) than cases flagged as "HIGH confidence" (50%).
-
-### 6.2 Explanation
-
-This counterintuitive result reveals two phenomena:
-
-1. **Model Overconfidence (High Conf → Low Acc)**
-   - Model produces extreme probabilities (P ≈ 0.9 or 0.1)
-   - Both UQ methods signal "high confidence"
-   - Reality: 50% accuracy = random performance
-   - **Interpretation:** Model is overconfident on genuinely difficult cases
-
-2. **Honest Uncertainty (Low Conf → High Acc)**
-   - Model produces moderate probabilities (P ≈ 0.5)
-   - Both UQ methods signal "low confidence"
-   - Reality: 92% accuracy = excellent performance
-   - **Interpretation:** Model correctly identifies borderline cases, but ground truth is actually clear
-
-### 6.3 Visualization
-
-![Overconfidence Paradox](figures/uq_paradox_analysis.png)
-
-### 6.4 Clinical Implications
-
-| Traditional Approach | Evidence-Based Approach |
-|---------------------|------------------------|
-| "Trust AI when confident" | "Trust AI when mutually uncertain" |
-| ❌ 50% accuracy on high-conf cases | ✅ 92% accuracy on low-conf cases |
-| 18% automation rate | 27% automation rate |
-| False sense of security | Honest risk assessment |
-
----
-
-## 🏥 7. Proposed Clinical Decision Framework
-
-Based on empirical findings, we propose a **revised 3-tier strategy**:
-
-### Tier 1: Safe Automation (27% of cases, 92% accuracy) ✅
-
-**Criteria:** Both Conformal AND Bayesian report LOW confidence
-
-**Action:**
-- Automated prognostic assignment
-- Standard monitoring protocol
-
-**Rationale:** Mutual low confidence paradoxically indicates reliable predictions
-
----
-
-### Tier 2: Assisted Review (54% of cases, 50% accuracy) ⚠️
-
-**Criteria:** UQ methods DISAGREE on confidence level
-
-**Action:**
-- Junior clinician review with AI assistance
-- Present uncertainty metrics to clinician
-
-**Rationale:** Mixed signals indicate genuinely ambiguous cases
-
----
-
-### Tier 3: Senior Escalation (18% of cases, 50% accuracy) 🚨
-
-**Criteria:** Both Conformal AND Bayesian report HIGH confidence
-
-**Action:**
-- Mandatory senior clinician review
-- Multidisciplinary team discussion
-- Treat AI prediction as hypothesis, not conclusion
-
-**Rationale:** High model confidence masks difficult cases prone to overconfident errors
-
----
-
-## 📁 8. Files and Reproducibility
-
-### Generated Files
-
-All results are available in this directory:
+Based on our findings, we propose a **revised 3-tier clinical decision framework**:
 ```
-results/
-├── figures/
-│   ├── baseline_performance.png
-│   ├── conformal_prediction_results.png
-│   ├── bayesian_inference_results.png
-│   ├── calibration_results.png
-│   ├── uq_methods_comparison.png
-│   └── uq_paradox_analysis.png
-├── tables/
-│   ├── conformal_prediction_results.csv
-│   ├── bayesian_inference_results.csv
-│   ├── calibration_results.csv
-│   ├── uq_methods_comparison.csv
-│   └── final_uq_classification.csv
-└── models/
-    ├── rf_optimized_final.pkl
-    ├── rf_platt_calibrated.pkl
-    └── rf_isotonic_calibrated.pkl
+✅ TIER 1 (27%): Safe Automation - Both methods LOW confidence → 92% accuracy
+⚠️  TIER 2 (54%): Assisted Review - Methods disagree → 50% accuracy  
+🚨 TIER 3 (18%): Senior Escalation - Both methods HIGH confidence → 50% accuracy
 ```
 
-### Reproducibility
-
-All experiments can be reproduced using the notebooks in `/notebooks/`.
-
-**Environment:**
-- Python 3.10+
-- scikit-learn 1.3.0
-- numpy, pandas, matplotlib
-- See `requirements.txt` for full dependencies
-
-**Hardware:**
-- Google Colab (Free tier)
-- Runtime: ~15 minutes for full pipeline
+**Impact:** This inverted strategy achieves both higher safety (92% vs 50%) and greater efficiency (27% vs 18% automation).
 
 ---
 
-## 🎓 9. Key Contributions
-
-1. ✅ **Methodological:** Implemented and compared 3 UQ methods for medical prognosis
-2. ✅ **Empirical:** Discovered the overconfidence paradox (low conf → high acc)
-3. ✅ **Clinical:** Proposed evidence-based decision framework inverting traditional strategy
-4. ✅ **Safety:** Identified dangerous overconfidence patterns in moderate-performing models
+## 📁 Project Structure
+```
+lung-cancer-uncertainty-quantification/
+│
+├── README.md                          # 👈 You are here
+├── requirements.txt                   # Python dependencies
+├── LICENSE                            # MIT License
+│
+├── data/                              # Dataset (not included for privacy)
+│   ├── README.md                      # Data description
+│   └── .gitkeep
+│
+├── notebooks/                         # 📓 Jupyter/Colab Notebooks
+│   ├── 01_data_preprocessing.ipynb       # Data cleaning & feature engineering
+│   ├── 02_baseline_model.ipynb           # Random Forest baseline
+│   ├── 03_conformal_prediction.ipynb     # Conformal UQ method
+│   ├── 04_bayesian_inference.ipynb       # Bayesian UQ method
+│   ├── 05_calibration.ipynb              # Calibration analysis
+│   └── 06_comparison.ipynb               # Comparative analysis
+│
+├── src/                               # 🐍 Python Source Code
+│   ├── __init__.py
+│   ├── preprocessing.py               # Data preprocessing functions
+│   ├── models.py                      # Model definitions
+│   ├── conformal.py                   # Conformal prediction implementation
+│   ├── bayesian.py                    # Bayesian inference implementation
+│   └── calibration.py                 # Calibration methods
+│
+├── results/                           # 📊 Results & Outputs
+│   ├── README.md                      # ⭐ Detailed results documentation
+│   ├── figures/                       # All generated plots
+│   ├── tables/                        # CSV results tables
+│   └── models/                        # Trained models (.pkl)
+│
+├── docs/                              # 📚 Documentation
+│   ├── methodology.md                 # Detailed methodology
+│   └── clinical_framework.md          # Clinical decision framework
+│
+└── tests/                             # ✅ Unit tests (optional)
+    └── test_conformal.py
+```
 
 ---
 
-## 📚 10. References
+## 🔧 Installation
 
-- Angelopoulos, A. N., & Bates, S. (2021). *A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification*. arXiv:2107.07511
-- Guo, C., et al. (2017). *On Calibration of Modern Neural Networks*. ICML 2017
-- Kendall, A., & Gal, Y. (2017). *What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision?*. NIPS 2017
+### Prerequisites
+
+- Python 3.10 or higher
+- pip package manager
+- (Optional) Google Colab account for cloud execution
+
+### Setup Instructions
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/OJules/lung-cancer-uncertainty-quantification.git
+cd lung-cancer-uncertainty-quantification
+```
+
+2. **Create a virtual environment** (recommended)
+```bash
+# Using venv
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Or using conda
+conda create -n lung-cancer-uq python=3.10
+conda activate lung-cancer-uq
+```
+
+3. **Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Verify installation**
+```bash
+python -c "import sklearn, numpy, pandas; print('✅ Installation successful!')"
+```
 
 ---
 
-## 📧 Contact
+## 🚀 Usage
 
-**Jules Odje**  
-Master's Student, University of Neuchâtel  
-Email: odjejulesgeraud@gmail.com 
-LinkedIn: linkedin.com/in/jules-odje  
-GitHub: https://github.com/OJules
+### Quick Start (Google Colab)
+
+The easiest way to run the project is via Google Colab:
+
+1. Open any notebook in `notebooks/`
+2. Click "Open in Colab" badge
+3. Run all cells
+
+### Local Execution
+```bash
+# Navigate to notebooks directory
+cd notebooks/
+
+# Launch Jupyter
+jupyter notebook
+
+# Or use JupyterLab
+jupyter lab
+```
+
+### Running the Full Pipeline
+
+Execute notebooks in order:
+```bash
+01_data_preprocessing.ipynb      # ~2 minutes
+02_baseline_model.ipynb          # ~3 minutes
+03_conformal_prediction.ipynb    # ~2 minutes
+04_bayesian_inference.ipynb      # ~2 minutes
+05_calibration.ipynb             # ~1 minute
+06_comparison.ipynb              # ~1 minute
+```
+
+**Total runtime:** ~15 minutes on Google Colab (free tier)
+
+---
+
+## 📊 Results
+
+All results are documented in detail in [`results/README.md`](results/README.md).
+
+### Quick Summary
+
+**Baseline Model:**
+- Accuracy: 61.4%
+- AUC-ROC: 0.598
+- Brier Score: 0.244
+
+**Best UQ Configuration:**
+- Conformal: 68.2% coverage (90% target)
+- Bayesian: 25% high confidence (adaptive thresholds)
+- Calibration: Already optimal (ECE = 0.042)
+
+### Key Visualizations
+
+<p align="center">
+  <img src="results/figures/uq_methods_comparison.png" width="800" alt="UQ Methods Comparison">
+  <br>
+  <em>Figure 1: Comparison of three uncertainty quantification methods</em>
+</p>
+
+<p align="center">
+  <img src="results/figures/uq_paradox_analysis.png" width="800" alt="Overconfidence Paradox">
+  <br>
+  <em>Figure 2: The overconfidence paradox - low confidence cases achieve higher accuracy</em>
+</p>
+
+For detailed results, see **[results/README.md](results/README.md)**.
+
+---
+
+## 🔬 Methodology
+
+### Dataset
+
+- **Source:** Lung Cancer Exploratory (LCE) dataset
+- **Size:** 218 patients (174 training, 44 test)
+- **Features:** 23 clinical and genomic features
+- **Target:** 5-year survival (binary: long-term vs short-term)
+
+### Models
+
+**Baseline:** Random Forest Classifier
+- n_estimators: 100
+- max_depth: 5
+- min_samples_split: 10
+
+**Optimization:** RandomizedSearchCV with 3-fold cross-validation
+
+### Uncertainty Quantification Methods
+
+#### 1. Conformal Prediction
+- **Framework:** Split conformal prediction
+- **Significance levels:** α = 0.05, 0.10
+- **Output:** Prediction sets {0}, {1}, or {0,1}
+
+#### 2. Bayesian Inference
+- **Approach:** Bootstrap aggregation via Random Forest trees
+- **Output:** Probability distributions with mean, std, credible intervals
+- **Thresholds:** Adaptive (percentile-based)
+
+#### 3. Model Calibration
+- **Methods:** Platt Scaling, Isotonic Regression
+- **Metrics:** Brier Score, Expected Calibration Error (ECE)
+- **Visualization:** Reliability diagrams
+
+### Evaluation Metrics
+
+- **Accuracy, AUC-ROC** (model performance)
+- **Coverage, Set Size** (conformal prediction)
+- **Std, Entropy, Credible Intervals** (Bayesian)
+- **Brier Score, ECE** (calibration)
+
+For complete methodology, see **[docs/methodology.md](docs/methodology.md)**.
+
+---
+
+## 🎓 Citation
+
+If you use this work in your research, please cite:
+```bibtex
+@mastersthesis{kouakou2024uncertainty,
+  title={Uncertainty Quantification for Machine Learning in Medical Prognosis: 
+         A Case Study on Lung Cancer Survival Prediction},
+  author={Odje, Jules },
+  year={2024},
+  school={University of Neuchâtel},
+  type={Master's Thesis},
+  address={Neuchâtel, Switzerland}
+}
+```
+
+---
+
+## 📚 References
+
+### Key Papers
+
+1. **Conformal Prediction:**
+   - Angelopoulos, A. N., & Bates, S. (2021). *A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification*. arXiv:2107.07511
+
+2. **Calibration:**
+   - Guo, C., et al. (2017). *On Calibration of Modern Neural Networks*. ICML 2017
+
+3. **Bayesian Deep Learning:**
+   - Kendall, A., & Gal, Y. (2017). *What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision?* NIPS 2017
+
+4. **Medical AI:**
+   - Kompa, B., et al. (2021). *Second Opinion Needed: Communicating Uncertainty in Medical Machine Learning*. npj Digital Medicine
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to:
+
+- 🐛 Report bugs via [Issues](https://github.com/[username]/lung-cancer-uncertainty-quantification/issues)
+- 💡 Suggest improvements
+- 🔧 Submit pull requests
+
+### Development Setup
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Run tests
+pytest tests/
+
+# Check code style
+flake8 src/
+black src/
+```
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+**Note:** The dataset is not included in this repository due to privacy considerations. Please refer to the original data source for access.
 
 ---
 
+## 📧 Contact
+
+**Jules Odje**
+
+- 🎓 Master's Student in Data Science & AI
+- 🏛️ University of Neuchâtel, Switzerland
+- 📧 Email: odjejulesgeraud@gmail.com
+- 💼 LinkedIn: [linkedin.com/in/jules-odje](https://linkedin.com/in/jules-odje)
+- 🐙 GitHub: [@JulesOdje](https://github.com/OJules)
+
+---
+
+## 🙏 Acknowledgments
+
+- **University of Neuchâtel** for academic support
+- **cBioPortal** for providing the lung cancer dataset
+- **Scikit-learn contributors** for excellent ML tools
+
+---
+
+## 📈 Project Status
+
+- ✅ Data preprocessing completed
+- ✅ Baseline model optimized
+- ✅ Three UQ methods implemented
+- ✅ Comparative analysis done
+- ✅ Clinical framework proposed
+
 **Last Updated:** November 2024
+
+---
+
+<p align="center">
+  <strong>⭐ If you find this project useful, please consider giving it a star! ⭐</strong>
+</p>
+
+<p align="center">
+  Made with ❤️ for safer medical AI
+</p>
