@@ -1,0 +1,84 @@
+# ============================================================================
+# UNCERTAINTY QUANTIFICATION FOR LUNG CANCER PROGNOSIS
+# Python Dependencies
+# 
+# Author: Jules Odje
+# Date: November 2024
+# Python Version: 3.10+
+# ============================================================================
+
+# Core Scientific Computing
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0,<3.0.0
+scipy>=1.10.0,<2.0.0
+
+# Machine Learning
+scikit-learn>=1.3.0,<2.0.0
+
+# Visualization
+matplotlib>=3.7.0,<4.0.0
+seaborn>=0.12.0,<1.0.0
+
+# Jupyter Notebooks
+jupyter>=1.0.0
+ipykernel>=6.25.0
+ipywidgets>=8.0.0
+
+# Data Handling
+openpyxl>=3.1.0        # For Excel files
+xlrd>=2.0.0            # For older Excel formats
+
+# Progress Bars
+tqdm>=4.65.0
+
+# Utilities
+python-dateutil>=2.8.0
+pytz>=2023.3
+
+# Optional: Advanced Plotting
+plotly>=5.14.0         # Interactive plots (optional)
+
+# Optional: Model Interpretability
+shap>=0.42.0           # SHAP values (optional)
+
+# ============================================================================
+# Development Dependencies (optional, for contributors)
+# Install with: pip install -r requirements-dev.txt
+# ============================================================================
+
+# Testing
+# pytest>=7.4.0
+# pytest-cov>=4.1.0
+
+# Code Quality
+# black>=23.7.0        # Code formatter
+# flake8>=6.0.0        # Linter
+# mypy>=1.4.0          # Type checker
+
+# Documentation
+# sphinx>=7.0.0
+# sphinx-rtd-theme>=1.2.0
+
+# ============================================================================
+# INSTALLATION INSTRUCTIONS
+# ============================================================================
+#
+# 1. Create virtual environment:
+#    python -m venv venv
+#    source venv/bin/activate  (Linux/Mac)
+#    venv\Scripts\activate     (Windows)
+#
+# 2. Install dependencies:
+#    pip install -r requirements.txt
+#
+# 3. Verify installation:
+#    python -c "import sklearn, numpy, pandas; print('✅ Success!')"
+#
+# ============================================================================
+# GOOGLE COLAB USERS
+# ============================================================================
+#
+# Most packages are pre-installed in Colab. Only run:
+#    !pip install openpyxl xlrd
+#
+# ============================================================================
