@@ -1,4 +1,4 @@
-# 🏥 Uncertainty Quantification for Lung Cancer Prognosis
+# 🏥 🧠 Uncertainty Quantification for Pediatric Brain Cancer Prognosis
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -28,7 +28,7 @@
 
 ## 🎯 Overview
 
-This project investigates **uncertainty quantification (UQ)** methods for machine learning models in medical prognosis, specifically focusing on lung cancer survival prediction. 
+This project investigates **uncertainty quantification (UQ)** methods for machine learning models in medical prognosis, specifically focusing on brain cancer survival prediction. 
 
 ### Why This Matters
 
@@ -142,7 +142,7 @@ git clone https://github.com/OJules/lung-cancer-uncertainty-quantification.git
 cd lung-cancer-uncertainty-quantification
 ```
 
-2. **Create a virtual environment** (recommended)
+2. **Create a virtual environment** 
 ```bash
 # Using venv
 python -m venv venv
