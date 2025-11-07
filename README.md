@@ -6,45 +6,76 @@
 
 **Master's Thesis Project**  
 *University of Neuchâtel - Data Science & AI*  
-**Author:** Jules Odje 
+**Author:** Jules Koffi Kouakou  
+**Supervisor:** [Nom du superviseur]  
 **Date:** November 2024
-
----
-
-## 📖 Table of Contents
-
-- [Overview](#-overview)
-- [Key Findings](#-key-findings)
-- [Project Structure](#-project-structure)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Results](#-results)
-- [Methodology](#-methodology)
-- [Citation](#-citation)
-- [License](#-license)
-- [Contact](#-contact)
 
 ---
 
 ## 🎯 Overview
 
-This project investigates **uncertainty quantification (UQ)** methods for machine learning models in medical prognosis, specifically focusing on brain cancer survival prediction. 
+This project investigates **uncertainty quantification (UQ)** methods for 
+machine learning models in medical prognosis, specifically focusing on 
+**pediatric brain cancer** (glioblastoma and astrocytoma) survival prediction.
 
 ### Why This Matters
 
-Machine learning models in healthcare often produce confident predictions without quantifying their uncertainty. This poses serious risks:
-- **Overconfident predictions** can lead to incorrect treatment decisions
-- **Lack of uncertainty awareness** prevents safe clinical deployment
-- **No mechanism to flag ambiguous cases** for expert review
+Pediatric brain tumors are the leading cause of cancer-related death in 
+children. Machine learning models can assist in prognosis prediction, but 
+they often produce confident predictions without quantifying their uncertainty. 
+This poses serious risks in pediatric oncology:
+
+- **Overconfident predictions** can lead to incorrect treatment decisions 
+  for vulnerable patients
+- **Lack of uncertainty awareness** prevents safe clinical deployment in 
+  pediatric care
+- **No mechanism to flag ambiguous cases** for expert review, critical when 
+  treating children
 
 ### Our Approach
 
-We implement and compare three complementary uncertainty quantification methods:
+We implement and compare three complementary uncertainty quantification 
+methods on a pediatric brain cancer cohort:
 
-1. **Conformal Prediction** - Provides prediction sets with mathematical coverage guarantees
-2. **Bayesian Inference** - Quantifies uncertainty through probability distributions
-3. **Model Calibration** - Ensures predicted probabilities reflect true likelihoods
+1. **Conformal Prediction** - Provides prediction sets with mathematical 
+   coverage guarantees
+2. **Bayesian Inference** - Quantifies uncertainty through probability 
+   distributions
+3. **Model Calibration** - Ensures predicted probabilities reflect true 
+   likelihoods
 
+---
+
+## 🔬 Dataset
+
+### Pediatric Brain Cancer Cohort
+
+- **Source:** cBioPortal Pediatric Brain Tumor Studies
+- **Tumor Types:** 
+  - Glioblastoma (high-grade)
+  - Astrocytoma (various grades)
+- **Population:** 218 pediatric patients
+- **Features:** 23 variables including:
+  - Molecular markers (mutation status, gene expression)
+  - Clinical characteristics (tumor location, grade, size)
+  - Demographic data (age at diagnosis, sex)
+  - Treatment information (surgery, chemotherapy, radiation)
+- **Target Variable:** 5-year survival status
+  - Long-term survivors (≥5 years)
+  - Short-term survivors (<5 years)
+- **Data Split:**
+  - Training: 174 patients (80%)
+  - Test: 44 patients (20%)
+
+### Clinical Context
+
+Pediatric brain tumors present unique challenges:
+- **Heterogeneity:** Wide variation in tumor biology and outcomes
+- **Limited data:** Rare disease with small cohorts
+- **High stakes:** Treatment decisions impact child development and quality of life
+- **Need for precision:** Balancing aggressive treatment vs. quality of life
+
+This makes uncertainty quantification particularly critical in this domain.
 ---
 
 ## 🔥 Key Findings
