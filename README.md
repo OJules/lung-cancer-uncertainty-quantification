@@ -6,8 +6,7 @@
 
 **Master's Thesis Project**  
 *University of Neuchâtel - Data Science & AI*  
-**Author:** Jules Koffi Kouakou  
-**Supervisor:** [Nom du superviseur]  
+**Author:** Jules Odje   
 **Date:** November 2024
 
 ---
@@ -356,7 +355,7 @@ If you use this work in your research, please cite:
 
 Contributions are welcome! Please feel free to:
 
-- 🐛 Report bugs via [Issues](https://github.com/[username]/lung-cancer-uncertainty-quantification/issues)
+- 🐛 Report bugs via [Issues](https://github.com/OJules/lung-cancer-uncertainty-quantification/issues)
 - 💡 Suggest improvements
 - 🔧 Submit pull requests
 
